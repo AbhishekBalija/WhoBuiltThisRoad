@@ -4,6 +4,8 @@ A public lookup tool that tells you who built any road, how much public money wa
 
 **Start with Bengaluru, India.** Every road built using public money has a paper trail — sanction orders, tenders, work orders, contractors, engineers, and defect liability periods. This information is public but locked inside government portals and PDFs. WhoBuiltThisRoad makes it accessible to every citizen.
 
+- **v0.1.0 — Data Foundation:** 408 road records parsed, normalized, and loaded. [View release notes](RELEASE_NOTES-v0.1.0.md)
+
 ## The Problem
 
 When a road develops potholes three months after construction, citizens are angry but helpless. They don't know who built it, whether the warranty is still active, which engineer signed off, or how much was spent. That information exists — it sits inside government portals that most citizens will never find.
@@ -14,7 +16,7 @@ This is not a pothole reporting app. Not a complaint portal. Not a grievance fil
 
 ## Status
 
-**Planning phase.** The product vision, technical architecture, and implementation plan are finalized. Code has not been written yet.
+**v0.1.0 — Data Foundation complete.** 408 road records parsed, normalized, and loaded into production database. Week 2 (backend API) is next.
 
 ## Tech Stack
 
