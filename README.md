@@ -5,6 +5,7 @@ A public lookup tool that tells you who built any road, how much public money wa
 **Start with Bengaluru, India.** Every road built using public money has a paper trail — sanction orders, tenders, work orders, contractors, engineers, and defect liability periods. This information is public but locked inside government portals and PDFs. WhoBuiltThisRoad makes it accessible to every citizen.
 
 - **v0.1.0 — Data Foundation:** 408 road records parsed, normalized, and loaded. [View release notes](RELEASE_NOTES-v0.1.0.md)
+- **Deployment:** Live at [who-built-this-road.vercel.app](https://who-built-this-road.vercel.app/) — health endpoint verified at `/api/health`
 
 ## The Problem
 
@@ -16,7 +17,7 @@ This is not a pothole reporting app. Not a complaint portal. Not a grievance fil
 
 ## Status
 
-**v0.1.0 — Data Foundation complete.** 408 road records parsed, normalized, and loaded into production database. Week 2 (backend API) is next.
+**v0.1.0 — Data Foundation complete.** 408 road records parsed, normalized, and loaded into production database. Deployed to Vercel — backend health endpoint verified. Week 2 (backend API) is next.
 
 ## Tech Stack
 
@@ -26,8 +27,7 @@ This is not a pothole reporting app. Not a complaint portal. Not a grievance fil
 | Backend | Go (Gin) |
 | Database | PostgreSQL (Neon) |
 | ETL | Python |
-| Frontend Hosting | Vercel |
-| Backend Hosting | Render |
+| Hosting | Vercel (single project, multi-service) |
 
 ## Project Structure
 
