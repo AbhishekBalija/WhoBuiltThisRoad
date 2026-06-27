@@ -17,6 +17,7 @@ data/processed/
 
 # Backend
 backend/bin/
+backend/server
 
 # Frontend
 frontend/node_modules/

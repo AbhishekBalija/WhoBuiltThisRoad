@@ -15,12 +15,7 @@ func main() {
 
 	r := gin.Default()
 
-	basePath := os.Getenv("API_BASE_PATH")
-	if basePath == "" {
-		basePath = "/api"
-	}
-	api := r.Group(basePath)
-	api.GET("/health", func(c *gin.Context) {
+	r.GET("/health", func(c *gin.Context) {
 		c.JSON(200, gin.H{"status": "ok"})
 	})
 
