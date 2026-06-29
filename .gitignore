@@ -1,6 +1,7 @@
 # Planning docs & agent memory (local-only artifacts)
 docs/
 .agents/
+AGENTS.md
 
 # Codebase knowledge graph (local-only)
 .codebase-memory/

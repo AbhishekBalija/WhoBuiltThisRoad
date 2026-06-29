@@ -4,7 +4,8 @@ A public lookup tool that tells you who built any road, how much public money wa
 
 **Start with Bengaluru, India.** Every road built using public money has a paper trail — sanction orders, tenders, work orders, contractors, engineers, and defect liability periods. This information is public but locked inside government portals and PDFs. WhoBuiltThisRoad makes it accessible to every citizen.
 
-- **v0.2.0 — Backend API:** Search, road profiles, ward listing, CORS. [View on GitHub](https://github.com/AbhishekBalija/WhoBuiltThisRoad/releases)
+- **v0.3.0 — Frontend Core:** Search, road profiles, sharing. [View on GitHub](https://github.com/AbhishekBalija/WhoBuiltThisRoad/releases)
+- **v0.2.0 — Backend API:** Search, road profiles, ward listing, CORS.
 - **v0.1.0 — Data Foundation:** 408 road records parsed, normalized, and loaded.
 - **Deployment:** Live at [who-built-this-road.vercel.app](https://who-built-this-road.vercel.app/) — health endpoint verified at `/api/health`
 
@@ -18,7 +19,7 @@ This is not a pothole reporting app. Not a complaint portal. Not a grievance fil
 
 ## Status
 
-**v0.2.0 — Backend API complete.** Search, road profile, ward listing, and CORS endpoints deployed. Week 3 (frontend) is next.
+**v0.3.0 — Frontend Core complete.** Search, road profiles, DLP status badges, financial summaries, and sharing. All wired end-to-end. Week 4 (polish) is next.
 
 ## API
 
@@ -38,7 +39,7 @@ Response shapes, error codes, and examples are documented in the [GitHub release
 
 | Layer | MVP |
 |---|---|
-| Frontend | React + Leaflet |
+| Frontend | React + Leaflet (bun) |
 | Backend | Go (Gin) |
 | Database | PostgreSQL (Neon) |
 | ETL | Python |
@@ -48,7 +49,7 @@ Response shapes, error codes, and examples are documented in the [GitHub release
 
 ```
 backend/       — Go API server
-frontend/      — React web app
+frontend/      — React web app (bun run dev, bun run build)
 etl/           — Python data pipelines
 docs/          — Planning docs (local-only)
 .agents/       — Agent memory files (local-only)

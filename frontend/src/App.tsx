@@ -1,8 +1,15 @@
+import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { Home } from './pages/Home'
+import { RoadProfile } from './pages/RoadProfile'
+
 function App() {
   return (
-    <>
-      <h1 className="bold text-4xl text-emerald-600">Who Built This Road</h1>
-    </>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/road/:slug" element={<RoadProfile />} />
+      </Routes>
+    </BrowserRouter>
   )
 }
 
