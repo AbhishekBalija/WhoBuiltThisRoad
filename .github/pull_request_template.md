@@ -7,12 +7,13 @@ Use a short branch name that explains the work:
 - docs/local-setup
 - test/search-results
 - chore/update-dependencies
+- release/week-4-release-candidate
 
 Keep the pull request focused on one change. Use a clear title, such as
 "Fix stale search results" instead of "Updates".
 -->
 
-- [ ] My branch follows `feature/`, `fix/`, `docs/`, `test/`, or `chore/` plus a short kebab-case name
+- [ ] My branch follows `feature/`, `fix/`, `docs/`, `test/`, `chore/`, or `release/` plus a short kebab-case name
 - [ ] My pull request title clearly describes the change
 - [ ] My commits have clear, understandable messages
 - [ ] This pull request targets `main`; I did not push directly to `main`
