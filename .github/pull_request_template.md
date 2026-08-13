@@ -1,3 +1,25 @@
+## Contributor basics
+
+<!--
+Use a short branch name that explains the work:
+- feature/road-map
+- fix/search-loading
+- docs/local-setup
+- test/search-results
+- chore/update-dependencies
+
+Keep the pull request focused on one change. Use a clear title, such as
+"Fix stale search results" instead of "Updates".
+-->
+
+- [ ] My branch follows `feature/`, `fix/`, `docs/`, `test/`, or `chore/` plus a short kebab-case name
+- [ ] My pull request title clearly describes the change
+- [ ] My commits have clear, understandable messages
+- [ ] This pull request targets `main`; I did not push directly to `main`
+- [ ] I linked the related issue below, if one exists
+
+**Related issue:** <!-- Example: Closes #12, or write "None" -->
+
 ## What changed?
 
 <!-- Explain the change in a few simple sentences. -->
@@ -20,6 +42,7 @@
 ## Before merging
 
 - [ ] The change is focused and does not include unrelated files
+- [ ] I checked that my branch does not contain accidental or generated files
 - [ ] Documentation was updated if behavior or setup changed
 - [ ] New or changed public data includes its source
 - [ ] No secrets or private information were committed
