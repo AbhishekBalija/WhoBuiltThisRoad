@@ -25,6 +25,7 @@ Open an issue describing:
 3. Make your changes
 4. Run the relevant frontend, backend, or ETL tests
 5. Push and open a PR
+6. Fill in the PR template using clear, everyday language so reviewers can quickly understand the change
 
 ## Development Setup
 
