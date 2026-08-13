@@ -1,0 +1,10 @@
+{
+  "name": "who-built-this-road",
+  "private": true,
+  "packageManager": "bun@1.3.14",
+  "scripts": {
+    "dev": "bash ./scripts/dev.sh",
+    "dev:backend": "cd backend && go run ./cmd/server",
+    "dev:frontend": "bun --cwd frontend run dev"
+  }
+}

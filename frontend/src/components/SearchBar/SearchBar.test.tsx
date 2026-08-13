@@ -39,7 +39,7 @@ async function typeAndAdvance(input: HTMLElement, text: string) {
 describe('SearchBar', () => {
   it('renders search input with placeholder', () => {
     setup()
-    expect(screen.getByPlaceholderText('Search any road in Bengaluru...')).toBeInTheDocument()
+    expect(screen.getByPlaceholderText('Search any road in Bengaluru…')).toBeInTheDocument()
   })
 
   it('shows no dropdown when query is short', async () => {
@@ -99,6 +99,65 @@ describe('SearchBar', () => {
     const input = screen.getByRole('combobox')
     await typeAndAdvance(input, 'xyz')
 
-    expect(screen.getByText(/no roads found/i)).toBeInTheDocument()
+    expect(screen.getByText(/No roads found — try a nearby landmark name/i)).toBeInTheDocument()
+  })
+
+  it('shows error message when search request fails', async () => {
+    vi.mocked(searchRoads).mockRejectedValue(new Error('Network error'))
+
+    setup()
+    const input = screen.getByRole('combobox')
+    await typeAndAdvance(input, 'xyz')
+
+    expect(screen.getByText('Could not load data. Please try again.')).toBeInTheDocument()
+  })
+
+  describe('mobile responsive', () => {
+    it('input uses touch-manipulation to prevent double-tap zoom delay', () => {
+      setup()
+      const input = screen.getByRole('combobox')
+      expect(input).toHaveClass('touch-manipulation')
+    })
+
+    it('input uses larger padding on mobile (py-3) for taller touch target', () => {
+      setup()
+      const input = screen.getByRole('combobox')
+      expect(input).toHaveClass('py-3')
+      expect(input).toHaveClass('sm:py-2.5')
+    })
+
+    it('input uses text-base on mobile to prevent iOS zoom-on-focus', () => {
+      setup()
+      const input = screen.getByRole('combobox')
+      expect(input).toHaveClass('text-base')
+    })
+
+    it('search results stack name and ward vertically on mobile', async () => {
+      vi.mocked(searchRoads).mockResolvedValue({
+        count: 1,
+        results: [{ id: 1, slug: 'road-a', name: 'Road A', description: null, ward_number: null, ward_name: 'Ward 1', division: 'East', length_km: null }],
+      })
+
+      setup()
+      const input = screen.getByRole('combobox')
+      await typeAndAdvance(input, 'roa')
+
+      const option = screen.getByRole('option')
+      const nameEl = option.querySelector('strong')
+      expect(nameEl).toHaveClass('block')
+      expect(nameEl).toHaveClass('break-words')
+    })
+
+    it('dropdown list uses overscroll-contain to prevent scroll chaining', async () => {
+      vi.mocked(searchRoads).mockResolvedValue({
+        count: 1,
+        results: [{ id: 1, slug: 'road-a', name: 'Road A', description: null, ward_number: null, ward_name: 'Ward 1', division: 'East', length_km: null }],
+      })
+
+      setup()
+      await typeAndAdvance(screen.getByRole('combobox'), 'roa')
+
+      expect(screen.getByRole('listbox')).toHaveClass('overscroll-contain')
+    })
   })
 })

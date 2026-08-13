@@ -19,7 +19,7 @@ This is not a pothole reporting app. Not a complaint portal. Not a grievance fil
 
 ## Status
 
-**v0.3.0 — Frontend Core complete.** Search, road profiles, DLP status badges, financial summaries, and sharing. All wired end-to-end. Week 4 (polish) is next.
+**v0.4.0 release candidate — Week 4 polish complete locally.** Production is live on v0.3.0. The pending local release adds mobile polish, resilient empty/error states, construction history, sharing metadata, and a repaired public source citation. It must be committed, deployed, and smoke-tested before launch.
 
 ## API
 
@@ -54,6 +54,19 @@ etl/           — Python data pipelines
 docs/          — Planning docs (local-only)
 .agents/       — Agent memory files (local-only)
 ```
+
+## Local Development
+
+Install the frontend dependencies once, then start the frontend and backend together from the repository root:
+
+```bash
+cd frontend && bun install && cd ..
+bun run dev
+```
+
+The app opens at `http://localhost:5173`; Vite proxies `/api/*` requests to the Go API at `http://localhost:8080`. Press `Ctrl+C` once to stop both services.
+
+To run either service separately, use `bun run dev:frontend` or `bun run dev:backend` from the repository root.
 
 ## Contributing
 

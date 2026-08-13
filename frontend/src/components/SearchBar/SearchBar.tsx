@@ -7,6 +7,7 @@ export function SearchBar() {
   const [query, setQuery] = useState('')
   const [results, setResults] = useState<Road[]>([])
   const [loading, setLoading] = useState(false)
+  const [error, setError] = useState(false)
   const navigate = useNavigate()
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const dropdownRef = useRef<HTMLDivElement>(null)
@@ -19,11 +20,13 @@ export function SearchBar() {
     if (debounceRef.current) clearTimeout(debounceRef.current)
     debounceRef.current = setTimeout(async () => {
       setLoading(true)
+      setError(false)
       try {
         const data = await searchRoads(query)
         setResults(data.results)
       } catch {
         setResults([])
+        setError(true)
       } finally {
         setLoading(false)
       }
@@ -56,14 +59,14 @@ export function SearchBar() {
     <div ref={dropdownRef} className="relative w-full max-w-xl">
       <input
         type="text"
-        placeholder="Search any road in Bengaluru..."
+        placeholder="Search any road in Bengaluru…"
         value={query}
         onChange={e => setQuery(e.target.value)}
         onFocus={() => {
           if (dropdownRef.current) dropdownRef.current.style.display = ''
         }}
         onBlur={handleBlur}
-        className="w-full rounded-lg border border-gray-300 px-4 py-2 shadow-sm focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+        className="w-full touch-manipulation rounded-lg border border-gray-300 px-4 py-3 text-base shadow-sm focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 sm:py-2.5"
         aria-label="Search roads"
         role="combobox"
         aria-expanded={showDropdown && results.length > 0}
@@ -72,14 +75,14 @@ export function SearchBar() {
       />
       {loading && (
         <div className="mt-1 text-sm text-gray-500" aria-live="polite">
-          Loading...
+          Loading…
         </div>
       )}
       {showDropdown && results.length > 0 && (
         <ul
           id="search-results"
           role="listbox"
-          className="absolute z-10 mt-1 max-h-60 w-full overflow-y-auto rounded-lg border border-gray-200 bg-white shadow-lg"
+          className="absolute z-10 mt-1 max-h-60 w-full overflow-y-auto overscroll-contain rounded-lg border border-gray-200 bg-white shadow-lg"
         >
           {results.map(road => (
             <li
@@ -91,17 +94,22 @@ export function SearchBar() {
               className="cursor-pointer px-4 py-2 hover:bg-gray-50 focus:bg-gray-50 focus:outline-none"
               tabIndex={0}
             >
-              <strong className="text-gray-900">{road.name}</strong>
-              <small className="ml-2 text-gray-500">
+              <strong className="block break-words text-gray-900">{road.name}</strong>
+              <small className="mt-0.5 block break-words text-gray-500">
                 {[road.ward_name, road.division].filter(Boolean).join(' · ')}
               </small>
             </li>
           ))}
         </ul>
       )}
-      {showDropdown && results.length === 0 && !loading && (
+      {showDropdown && error && (
+        <div className="absolute z-10 mt-1 w-full rounded-lg border border-red-100 bg-white p-4 text-sm text-red-600 shadow-lg" aria-live="assertive" role="alert">
+          Could not load data. Please try again.
+        </div>
+      )}
+      {showDropdown && results.length === 0 && !loading && !error && (
         <div className="absolute z-10 mt-1 w-full rounded-lg border border-gray-200 bg-white p-4 text-sm text-gray-500 shadow-lg" aria-live="polite">
-          No roads found for &ldquo;{query}&rdquo;
+          No roads found &mdash; try a nearby landmark name
         </div>
       )}
     </div>

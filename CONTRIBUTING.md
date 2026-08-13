@@ -23,24 +23,37 @@ Open an issue describing:
 1. Fork the repo
 2. Create a branch: `git checkout -b feature/your-feature`
 3. Make your changes
-4. Run any existing tests: `npm test` or `go test ./...`
+4. Run the relevant frontend, backend, or ETL tests
 5. Push and open a PR
 
 ## Development Setup
 
-The short version of the dev setup:
+Install the frontend dependencies once:
 
 ```bash
-# Backend
-cd backend
-go run cmd/server/main.go
-
-# Frontend
 cd frontend
-npm install
-npm run dev
+bun install
+cd ..
+```
 
-# ETL
+Then start the complete application from the repository root:
+
+```bash
+bun run dev
+```
+
+This starts the Go API on port `8080` and the Vite frontend on port `5173`. Press `Ctrl+C` once to stop both.
+
+Run a single service when needed:
+
+```bash
+bun run dev:backend
+bun run dev:frontend
+```
+
+Set up the ETL environment separately:
+
+```bash
 cd etl
 python -m venv venv
 source venv/bin/activate
