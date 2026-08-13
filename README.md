@@ -4,7 +4,8 @@ A public lookup tool that tells you who built any road, how much public money wa
 
 **Start with Bengaluru, India.** Every road built using public money has a paper trail — sanction orders, tenders, work orders, contractors, engineers, and defect liability periods. This information is public but locked inside government portals and PDFs. WhoBuiltThisRoad makes it accessible to every citizen.
 
-- **v0.3.0 — Frontend Core:** Search, road profiles, sharing. [View on GitHub](https://github.com/AbhishekBalija/WhoBuiltThisRoad/releases)
+- **v0.4.0 — First Stable Release:** Mobile polish, construction history, resilient states, sharing metadata, and contributor guidance. [View release](https://github.com/AbhishekBalija/WhoBuiltThisRoad/releases/tag/v0.4.0)
+- **v0.3.0 — Frontend Core:** Search, road profiles, sharing.
 - **v0.2.0 — Backend API:** Search, road profiles, ward listing, CORS.
 - **v0.1.0 — Data Foundation:** 408 road records parsed, normalized, and loaded.
 - **Deployment:** Live at [who-built-this-road.vercel.app](https://who-built-this-road.vercel.app/) — health endpoint verified at `/api/health`
@@ -19,7 +20,7 @@ This is not a pothole reporting app. Not a complaint portal. Not a grievance fil
 
 ## Status
 
-**v0.4.0 release candidate — Week 4 polish complete locally.** Production is live on v0.3.0. The pending local release adds mobile polish, resilient empty/error states, construction history, sharing metadata, and a repaired public source citation. It must be committed, deployed, and smoke-tested before launch.
+**v0.4.0 is the first stable release and is live in production.** The release includes mobile polish, resilient empty/error states, construction history, readable sharing metadata, accurate work-order financial fields, and repaired public source citations. Desktop, mobile, API, and source-link smoke tests passed after deployment.
 
 ## API
 
