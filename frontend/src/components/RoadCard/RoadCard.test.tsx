@@ -1,6 +1,7 @@
 import { render, screen } from '@testing-library/react'
 import { describe, it, expect } from 'vitest'
 import { RoadCard } from './RoadCard'
+import { EXTERNAL_LINKS } from '@/config/external-links'
 import type { Road, WorkOrder } from '@/types'
 
 const mockRoad: Road = {
@@ -83,15 +84,31 @@ describe('RoadCard', () => {
     expect(sourceLink).toHaveAttribute('href', 'https://example.com/doc')
   })
 
+  it('resolves the imported DLP filename to its public OpenCity source', () => {
+    render(<RoadCard road={mockRoad} workOrders={[{ ...mockWorkOrder, source_document: 'dlp_east_2017.pdf' }]} />)
+    expect(screen.getByRole('link', { name: 'BBMP DLP Register' })).toHaveAttribute(
+      'href',
+      EXTERNAL_LINKS.dlpRegister2017.url,
+    )
+  })
+
   it('renders completion and warranty dates', () => {
     render(<RoadCard road={mockRoad} workOrders={[mockWorkOrder]} />)
     expect(screen.getByText('15 June 2023')).toBeInTheDocument()
     expect(screen.getByText('15 June 2025')).toBeInTheDocument()
   })
 
-  it('shows no-data message when workOrders is empty', () => {
+  it('shows no-data message with data source links when workOrders is empty', () => {
     render(<RoadCard road={mockRoad} workOrders={[]} />)
-    expect(screen.getByText('No work order data available for this road yet.')).toBeInTheDocument()
+    expect(screen.getByText('No work order data found for this road yet. View all available government data sources below.')).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: EXTERNAL_LINKS.openCityWorkOrders.label })).toHaveAttribute(
+      'href',
+      EXTERNAL_LINKS.openCityWorkOrders.url,
+    )
+    expect(screen.getByRole('link', { name: EXTERNAL_LINKS.bbmpWorksBillPublicView.label })).toHaveAttribute(
+      'href',
+      EXTERNAL_LINKS.bbmpWorksBillPublicView.url,
+    )
   })
 
   it('handles missing optional fields', () => {
@@ -120,5 +137,69 @@ describe('RoadCard', () => {
     expect(screen.queryByText('AE Name')).not.toBeInTheDocument()
     expect(screen.queryByText('AEE Name')).not.toBeInTheDocument()
     expect(screen.queryByText('EE Name')).not.toBeInTheDocument()
+  })
+
+  it('renders WorkOrderTimeline when there are multiple work orders', () => {
+    const olderWorkOrder: WorkOrder = {
+      ...mockWorkOrder,
+      id: 2,
+      contractor_name: 'Old Contractor',
+      completion_date: '2018-01-01',
+      amount_paid: 12000000,
+      source_document: 'https://example.com/old',
+      source_label: 'Old Source',
+    }
+    render(<RoadCard road={mockRoad} workOrders={[mockWorkOrder, olderWorkOrder]} />)
+    expect(screen.getByText('Full Construction History')).toBeInTheDocument()
+    expect(screen.getByText('Old Contractor')).toBeInTheDocument()
+    expect(screen.getByText('2018')).toBeInTheDocument()
+  })
+
+  it('does not render WorkOrderTimeline when there is only one work order', () => {
+    render(<RoadCard road={mockRoad} workOrders={[mockWorkOrder]} />)
+    expect(screen.queryByText('Full Construction History')).not.toBeInTheDocument()
+  })
+
+  describe('mobile responsive', () => {
+    it('InfoRow uses flex-col on mobile (label and value stack vertically)', () => {
+      render(<RoadCard road={mockRoad} workOrders={[mockWorkOrder]} />)
+      const contractorRow = screen.getByText('Contractor').parentElement
+      expect(contractorRow).toHaveClass('flex-col')
+      expect(contractorRow).toHaveClass('sm:flex-row')
+    })
+
+    it('DLP badge and heading stack vertically on mobile', () => {
+      render(<RoadCard road={mockRoad} workOrders={[mockWorkOrder]} />)
+      const badge = screen.getByText('Warranty Expired').parentElement
+      const container = badge?.parentElement
+      expect(container).toHaveClass('flex-col')
+      expect(container).toHaveClass('sm:flex-row')
+    })
+
+    it('road name uses break-words to prevent overflow', () => {
+      render(<RoadCard road={mockRoad} workOrders={[mockWorkOrder]} />)
+      const heading = screen.getByRole('heading', { level: 1 })
+      expect(heading).toHaveClass('break-words')
+    })
+
+    it('article container prevents horizontal overflow', () => {
+      render(<RoadCard road={mockRoad} workOrders={[mockWorkOrder]} />)
+      const article = screen.getByRole('article')
+      expect(article).toHaveClass('overflow-x-hidden')
+    })
+
+    it('uses smaller padding on mobile (p-4) and larger on sm (p-6)', () => {
+      render(<RoadCard road={mockRoad} workOrders={[mockWorkOrder]} />)
+      const article = screen.getByRole('article')
+      expect(article).toHaveClass('p-4')
+      expect(article).toHaveClass('sm:p-6')
+    })
+
+    it('heading uses responsive font sizing (text-lg on mobile, text-xl on sm)', () => {
+      render(<RoadCard road={mockRoad} workOrders={[mockWorkOrder]} />)
+      const heading = screen.getByRole('heading', { level: 1 })
+      expect(heading).toHaveClass('text-lg')
+      expect(heading).toHaveClass('sm:text-xl')
+    })
   })
 })

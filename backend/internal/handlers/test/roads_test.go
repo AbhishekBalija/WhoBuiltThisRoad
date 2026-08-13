@@ -69,8 +69,8 @@ func TestSearchNoResults(t *testing.T) {
 	}
 
 	var body struct {
-		Count   int            `json:"count"`
-		Results []any          `json:"results"`
+		Count   int   `json:"count"`
+		Results []any `json:"results"`
 	}
 	json.Unmarshal(w.Body.Bytes(), &body)
 	if body.Count != 0 {
@@ -237,7 +237,15 @@ func TestGetRoadWorkOrderFields(t *testing.T) {
 	}
 
 	first := body.WorkOrders[0]
-	requiredFields := []string{"id", "contractor_name", "dlp_status", "source_document", "source_label"}
+	requiredFields := []string{
+		"id",
+		"contractor_name",
+		"dlp_status",
+		"project_cost",
+		"amount_paid",
+		"source_document",
+		"source_label",
+	}
 	for _, f := range requiredFields {
 		if _, ok := first[f]; !ok {
 			t.Fatalf("work order missing field: %s", f)

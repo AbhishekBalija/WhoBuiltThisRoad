@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import RoadProfile from './RoadProfile'
 
 vi.mock('@/hooks/useRoad', () => ({
@@ -19,10 +19,24 @@ function renderWithRoute(slug = 'test-road') {
   )
 }
 
+function getMeta(attribute: string, name: string): string | null {
+  const el = document.querySelector<HTMLMetaElement>(`meta[${attribute}="${name}"]`)
+  return el?.getAttribute('content') ?? null
+}
+
 describe('RoadProfile', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     document.title = ''
+    document.querySelectorAll('meta[property^="og:"], meta[name^="twitter:"]').forEach((el) => {
+      el.remove()
+    })
+  })
+
+  afterEach(() => {
+    document.querySelectorAll('meta[property^="og:"], meta[name^="twitter:"]').forEach((el) => {
+      el.remove()
+    })
   })
 
   it('shows loading state', () => {
@@ -34,19 +48,19 @@ describe('RoadProfile', () => {
       error: null,
     })
     renderWithRoute()
-    expect(screen.getByText('Loading road data...')).toBeInTheDocument()
+    expect(screen.getByText('Loading road data…')).toBeInTheDocument()
   })
 
-  it('shows error state with message', () => {
+  it('shows normalized error state when API request fails', () => {
     vi.mocked(useRoad).mockReturnValue({
       loading: false,
       road: null,
       workOrders: [],
       notFound: false,
-      error: 'API error',
+      error: 'API error: 500',
     })
     renderWithRoute()
-    expect(screen.getByText('API error')).toBeInTheDocument()
+    expect(screen.getByText('Could not load data. Please try again.')).toBeInTheDocument()
     expect(screen.getByText(/Search again/)).toBeInTheDocument()
   })
 
@@ -89,5 +103,43 @@ describe('RoadProfile', () => {
     })
     renderWithRoute()
     expect(document.title).toBe('Test Road — WhoBuiltThisRoad')
+  })
+
+  it('sets Open Graph and Twitter Card meta tags from road data', () => {
+    vi.mocked(useRoad).mockReturnValue({
+      loading: false,
+      road: { id: 1, slug: 'test-road', name: 'Test Road', ward_name: 'Ward 1', description: '', division: 'East', length_km: null, ward_number: null },
+      workOrders: [
+        { id: 1, contractor_name: 'Builder Co', contractor_phone: null, ae_name: null, ae_phone: null, aee_name: null, aee_phone: null, ee_name: null, ee_phone: null, completion_date: '2023-06-15', dlp_expiry_date: '2025-06-15', dlp_status: 'active' as const, days_remaining: 365, project_cost: null, amount_paid: null, source_document: 'https://example.com', source_label: 'Source' },
+      ],
+      notFound: false,
+      error: null,
+    })
+    renderWithRoute()
+
+    expect(document.title).toBe('Test Road — WhoBuiltThisRoad')
+    expect(getMeta('property', 'og:title')).toBe('Test Road — WhoBuiltThisRoad')
+    expect(getMeta('property', 'og:description')).toBe('Test Road — built by Builder Co. Warranty: still active. View the public record on WhoBuiltThisRoad.')
+    expect(getMeta('property', 'og:type')).toBe('website')
+    expect(getMeta('name', 'twitter:card')).toBe('summary')
+    expect(getMeta('name', 'twitter:title')).toBe('Test Road — WhoBuiltThisRoad')
+    expect(getMeta('name', 'twitter:description')).toBe('Test Road — built by Builder Co. Warranty: still active. View the public record on WhoBuiltThisRoad.')
+  })
+
+  it('uses readable warranty wording in metadata', () => {
+    vi.mocked(useRoad).mockReturnValue({
+      loading: false,
+      road: { id: 1, slug: 'test-road', name: 'Test Road', ward_name: 'Ward 1', description: '', division: 'East', length_km: null, ward_number: null },
+      workOrders: [
+        { id: 1, contractor_name: 'Builder Co', contractor_phone: null, ae_name: null, ae_phone: null, aee_name: null, aee_phone: null, ee_name: null, ee_phone: null, completion_date: null, dlp_expiry_date: null, dlp_status: 'expiring_soon' as const, days_remaining: 10, project_cost: null, amount_paid: null, source_document: 'https://example.com', source_label: 'Source' },
+      ],
+      notFound: false,
+      error: null,
+    })
+
+    renderWithRoute()
+
+    expect(getMeta('property', 'og:description')).toContain('Warranty: expiring soon.')
+    expect(getMeta('property', 'og:description')).not.toContain('expiring_soon')
   })
 })
