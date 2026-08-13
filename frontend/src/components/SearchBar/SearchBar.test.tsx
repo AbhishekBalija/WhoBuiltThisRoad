@@ -112,6 +112,32 @@ describe('SearchBar', () => {
     expect(screen.getByText('Could not load data. Please try again.')).toBeInTheDocument()
   })
 
+  it('ignores an older failed request after a newer search succeeds', async () => {
+    let rejectOlderRequest: (reason?: unknown) => void = () => undefined
+    vi.mocked(searchRoads)
+      .mockImplementationOnce(() => new Promise((_, reject) => { rejectOlderRequest = reject }))
+      .mockResolvedValueOnce({
+        count: 1,
+        results: [{ id: 2, slug: 'new-road', name: 'New Road', description: null, ward_number: null, ward_name: null, division: 'East', length_km: null }],
+      })
+
+    setup()
+    const input = screen.getByRole('combobox')
+    await typeAndAdvance(input, 'old')
+
+    const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime })
+    await user.clear(input)
+    await user.type(input, 'new')
+    await act(async () => { vi.advanceTimersByTime(400) })
+
+    expect(screen.getByRole('option', { name: /New Road/ })).toBeInTheDocument()
+
+    await act(async () => { rejectOlderRequest(new Error('Older request failed')) })
+
+    expect(screen.queryByText('Could not load data. Please try again.')).not.toBeInTheDocument()
+    expect(screen.getByRole('option', { name: /New Road/ })).toBeInTheDocument()
+  })
+
   describe('mobile responsive', () => {
     it('input uses touch-manipulation to prevent double-tap zoom delay', () => {
       setup()

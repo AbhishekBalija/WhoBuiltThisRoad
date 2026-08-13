@@ -16,6 +16,8 @@ type WorkOrder struct {
 	DLPExpiryDate   *time.Time `json:"dlp_expiry_date"`
 	DLPStatus       string     `json:"dlp_status"`
 	DaysRemaining   *int       `json:"days_remaining"`
+	ProjectCost     *float64   `json:"project_cost"`
+	AmountPaid      *float64   `json:"amount_paid"`
 	SourceDocument  string     `json:"source_document"`
 	SourceLabel     string     `json:"source_label"`
 }

@@ -8,8 +8,13 @@ const mockWriteText = vi.fn()
 
 beforeEach(() => {
   vi.clearAllMocks()
+  mockWriteText.mockReset()
+  mockWriteText.mockResolvedValue(undefined)
   vi.stubGlobal('open', mockOpen)
-  vi.stubGlobal('navigator', { clipboard: { writeText: mockWriteText } })
+  Object.defineProperty(navigator, 'clipboard', {
+    configurable: true,
+    value: { writeText: mockWriteText },
+  })
   vi.useFakeTimers({ shouldAdvanceTime: true })
 })
 
@@ -60,6 +65,18 @@ describe('ShareButton', () => {
     expect(screen.getByRole('button', { name: 'Copy link' })).toBeInTheDocument()
   })
 
+  it('reports a clipboard failure without showing success', async () => {
+    render(<ShareButton {...baseProps} />)
+    const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime })
+    vi.spyOn(navigator.clipboard, 'writeText').mockRejectedValueOnce(new Error('Clipboard unavailable'))
+
+    await user.click(screen.getByRole('button', { name: 'Copy link' }))
+
+    expect(screen.getByRole('button', { name: 'Copy failed' })).toBeInTheDocument()
+    expect(screen.getByText('Could not copy link')).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Link copied' })).not.toBeInTheDocument()
+  })
+
   it('handles missing work order gracefully', () => {
     render(<ShareButton road={baseProps.road} />)
     expect(screen.getByRole('button', { name: 'Share on WhatsApp' })).toBeInTheDocument()
@@ -68,14 +85,22 @@ describe('ShareButton', () => {
   it('includes warranty status text for active', async () => {
     render(<ShareButton {...baseProps} />)
     await userEvent.setup({ advanceTimers: vi.advanceTimersByTime }).click(screen.getByRole('button', { name: 'Share on WhatsApp' }))
-    expect(decodeURIComponent(mockOpen.mock.calls[0][0])).toContain('warranty still active')
+    expect(decodeURIComponent(mockOpen.mock.calls[0][0])).toContain('Warranty still active')
   })
 
   describe('mobile responsive', () => {
     it('share buttons use p-3 for 44px minimum touch target', () => {
       render(<ShareButton {...baseProps} />)
-      const whatsappBtn = screen.getByRole('button', { name: 'Share on WhatsApp' })
-      expect(whatsappBtn).toHaveClass('p-3')
+      const shareButtons = [
+        screen.getByRole('button', { name: 'Share on WhatsApp' }),
+        screen.getByRole('button', { name: 'Share on X' }),
+        screen.getByRole('button', { name: 'Copy link' }),
+      ]
+      for (const button of shareButtons) {
+        expect(button).toHaveClass('p-3')
+        expect(button).toHaveClass('min-h-11')
+        expect(button).toHaveClass('min-w-11')
+      }
     })
 
     it('share buttons have focus-visible ring for keyboard navigation', () => {

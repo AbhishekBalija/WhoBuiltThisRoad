@@ -33,6 +33,15 @@ describe('Home', () => {
     expect(screen.getByPlaceholderText('Search any road in Bengaluru…')).toBeInTheDocument()
   })
 
+  it('sets the default page metadata', () => {
+    document.title = 'Old Road — WhoBuiltThisRoad'
+    renderHome()
+
+    expect(document.title).toBe('Who Built This Road')
+    expect(document.querySelector('meta[property="og:title"]')).toHaveAttribute('content', 'Who Built This Road')
+    expect(document.querySelector('meta[property="og:url"]')).toHaveAttribute('content', window.location.href)
+  })
+
   describe('mobile responsive', () => {
     it('heading uses responsive font sizing (text-2xl on mobile, text-4xl on sm)', () => {
       renderHome()

@@ -2,6 +2,8 @@ import { Link, useParams } from 'react-router-dom'
 import { Meta } from '@/components/Meta'
 import { RoadCard } from '@/components/RoadCard'
 import { useRoad } from '@/hooks/useRoad'
+import type { DLPStatus } from '@/types'
+import { DLP_STATUS_TEXT } from '@/utils/dlpStatus'
 
 function LoadingState() {
   return (
@@ -29,9 +31,9 @@ function NotFoundState() {
   )
 }
 
-function buildMetaDescription(roadName: string, latest?: { contractor_name: string | null; dlp_status: string }) {
+function buildMetaDescription(roadName: string, latest?: { contractor_name: string | null; dlp_status: DLPStatus }) {
   const contractor = latest?.contractor_name ?? 'unknown contractor'
-  const warranty = latest?.dlp_status ?? 'unknown'
+  const warranty = DLP_STATUS_TEXT[latest?.dlp_status ?? 'unknown']
   return `${roadName} — built by ${contractor}. Warranty: ${warranty}. View the public record on WhoBuiltThisRoad.`
 }
 

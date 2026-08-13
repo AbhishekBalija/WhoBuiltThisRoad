@@ -5,6 +5,8 @@ set -u
 project_root="$(cd "$(dirname "$0")/.." && pwd)"
 backend_pid=""
 frontend_pid=""
+backend_build_dir="$(mktemp -d)"
+backend_binary="$backend_build_dir/server"
 
 cleanup() {
   trap - EXIT INT TERM
@@ -19,6 +21,7 @@ cleanup() {
 
   [ -n "$frontend_pid" ] && wait "$frontend_pid" 2>/dev/null || true
   [ -n "$backend_pid" ] && wait "$backend_pid" 2>/dev/null || true
+  rm -rf "$backend_build_dir"
 }
 
 trap cleanup EXIT
@@ -27,7 +30,11 @@ trap 'exit 130' INT TERM
 echo "Starting backend at http://localhost:8080"
 (
   cd "$project_root/backend" || exit 1
-  exec go run ./cmd/server
+  go build -o "$backend_binary" ./cmd/server
+)
+(
+  cd "$project_root/backend" || exit 1
+  exec env PORT=8080 "$backend_binary"
 ) &
 backend_pid=$!
 

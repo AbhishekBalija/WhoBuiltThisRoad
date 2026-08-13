@@ -46,6 +46,7 @@ func GetRoad(c *gin.Context) {
 			wo.ee_name, wo.ee_phone,
 			wo.completion_date, wo.dlp_expiry_date,
 			wo.dlp_status, wo.days_remaining,
+			wo.project_cost, wo.amount_paid,
 			wo.source_document, wo.source_label
 		FROM work_orders_with_status wo
 		JOIN roads r ON r.id = wo.road_id

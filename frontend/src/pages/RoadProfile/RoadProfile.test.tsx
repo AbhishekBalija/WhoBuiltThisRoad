@@ -119,10 +119,27 @@ describe('RoadProfile', () => {
 
     expect(document.title).toBe('Test Road — WhoBuiltThisRoad')
     expect(getMeta('property', 'og:title')).toBe('Test Road — WhoBuiltThisRoad')
-    expect(getMeta('property', 'og:description')).toBe('Test Road — built by Builder Co. Warranty: active. View the public record on WhoBuiltThisRoad.')
+    expect(getMeta('property', 'og:description')).toBe('Test Road — built by Builder Co. Warranty: still active. View the public record on WhoBuiltThisRoad.')
     expect(getMeta('property', 'og:type')).toBe('website')
     expect(getMeta('name', 'twitter:card')).toBe('summary')
     expect(getMeta('name', 'twitter:title')).toBe('Test Road — WhoBuiltThisRoad')
-    expect(getMeta('name', 'twitter:description')).toBe('Test Road — built by Builder Co. Warranty: active. View the public record on WhoBuiltThisRoad.')
+    expect(getMeta('name', 'twitter:description')).toBe('Test Road — built by Builder Co. Warranty: still active. View the public record on WhoBuiltThisRoad.')
+  })
+
+  it('uses readable warranty wording in metadata', () => {
+    vi.mocked(useRoad).mockReturnValue({
+      loading: false,
+      road: { id: 1, slug: 'test-road', name: 'Test Road', ward_name: 'Ward 1', description: '', division: 'East', length_km: null, ward_number: null },
+      workOrders: [
+        { id: 1, contractor_name: 'Builder Co', contractor_phone: null, ae_name: null, ae_phone: null, aee_name: null, aee_phone: null, ee_name: null, ee_phone: null, completion_date: null, dlp_expiry_date: null, dlp_status: 'expiring_soon' as const, days_remaining: 10, project_cost: null, amount_paid: null, source_document: 'https://example.com', source_label: 'Source' },
+      ],
+      notFound: false,
+      error: null,
+    })
+
+    renderWithRoute()
+
+    expect(getMeta('property', 'og:description')).toContain('Warranty: expiring soon.')
+    expect(getMeta('property', 'og:description')).not.toContain('expiring_soon')
   })
 })

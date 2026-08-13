@@ -10,11 +10,14 @@ export function SearchBar() {
   const [error, setError] = useState(false)
   const navigate = useNavigate()
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const requestIdRef = useRef(0)
   const dropdownRef = useRef<HTMLDivElement>(null)
 
   const showDropdown = query.length >= 3
 
   useEffect(() => {
+    const requestId = ++requestIdRef.current
+
     if (query.length < 3) return
 
     if (debounceRef.current) clearTimeout(debounceRef.current)
@@ -23,17 +26,20 @@ export function SearchBar() {
       setError(false)
       try {
         const data = await searchRoads(query)
-        setResults(data.results)
+        if (requestId === requestIdRef.current) setResults(data.results)
       } catch {
-        setResults([])
-        setError(true)
+        if (requestId === requestIdRef.current) {
+          setResults([])
+          setError(true)
+        }
       } finally {
-        setLoading(false)
+        if (requestId === requestIdRef.current) setLoading(false)
       }
     }, 300)
 
     return () => {
       if (debounceRef.current) clearTimeout(debounceRef.current)
+      if (requestId === requestIdRef.current) requestIdRef.current += 1
     }
   }, [query])
 
@@ -73,7 +79,7 @@ export function SearchBar() {
         aria-autocomplete="list"
         aria-controls="search-results"
       />
-      {loading && (
+      {showDropdown && loading && (
         <div className="mt-1 text-sm text-gray-500" aria-live="polite">
           Loading…
         </div>

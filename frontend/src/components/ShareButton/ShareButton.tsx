@@ -1,12 +1,6 @@
 import { useState } from 'react'
-import type { Road, WorkOrder, DLPStatus } from '@/types'
-
-const STATUS_TEXT: Record<DLPStatus, string> = {
-  active: 'warranty still active',
-  expiring_soon: 'warranty expiring soon',
-  expired: 'warranty already expired',
-  unknown: '',
-}
+import type { Road, WorkOrder } from '@/types'
+import { DLP_STATUS_TEXT } from '@/utils/dlpStatus'
 
 export interface ShareButtonProps {
   road: Pick<Road, 'slug' | 'name' | 'ward_name'>
@@ -47,14 +41,14 @@ function CheckIcon() {
 }
 
 export function ShareButton({ road, latestWorkOrder }: ShareButtonProps) {
-  const [copied, setCopied] = useState(false)
+  const [copyStatus, setCopyStatus] = useState<'idle' | 'copied' | 'error'>('idle')
 
   const url = `${window.location.origin}/road/${road.slug}`
   const contractor = latestWorkOrder?.contractor_name || 'unknown contractor'
   const dlpStatus = latestWorkOrder?.dlp_status || 'unknown'
-  const statusText = STATUS_TEXT[dlpStatus]
+  const statusText = DLP_STATUS_TEXT[dlpStatus]
 
-  const shareText = `${road.name} (${road.ward_name}) was built by ${contractor}. ${statusText}. Public record:`.replace(/\s+/g, ' ').trim()
+  const shareText = `${road.name} (${road.ward_name}) was built by ${contractor}. Warranty ${statusText}. Public record:`.replace(/\s+/g, ' ').trim()
 
   function shareWhatsApp() {
     window.open(`https://wa.me/?text=${encodeURIComponent(shareText + ' ' + url)}`, '_blank')
@@ -67,11 +61,11 @@ export function ShareButton({ road, latestWorkOrder }: ShareButtonProps) {
   async function copyLink() {
     try {
       await navigator.clipboard.writeText(url)
+      setCopyStatus('copied')
     } catch {
-      // clipboard unavailable — show feedback anyway
+      setCopyStatus('error')
     }
-    setCopied(true)
-    setTimeout(() => setCopied(false), 2000)
+    setTimeout(() => setCopyStatus('idle'), 2000)
   }
 
   return (
@@ -81,24 +75,27 @@ export function ShareButton({ road, latestWorkOrder }: ShareButtonProps) {
         <button
           onClick={shareWhatsApp}
           aria-label="Share on WhatsApp"
-          className="rounded-full bg-[#25D366] p-3 text-white transition-colors hover:bg-[#1ebe5b] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2"
+          className="min-h-11 min-w-11 rounded-full bg-[#25D366] p-3 text-white transition-colors hover:bg-[#1ebe5b] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2"
         >
           <WhatsAppIcon />
         </button>
         <button
           onClick={shareX}
           aria-label="Share on X"
-          className="rounded-full bg-black p-3 text-white transition-colors hover:bg-gray-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2"
+          className="min-h-11 min-w-11 rounded-full bg-black p-3 text-white transition-colors hover:bg-gray-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2"
         >
           <XIcon />
         </button>
         <button
           onClick={copyLink}
-          aria-label={copied ? 'Link copied' : 'Copy link'}
-          className="rounded-full border border-gray-300 p-3 text-gray-600 transition-colors hover:bg-gray-50 hover:text-gray-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2"
+          aria-label={copyStatus === 'copied' ? 'Link copied' : copyStatus === 'error' ? 'Copy failed' : 'Copy link'}
+          className="min-h-11 min-w-11 rounded-full border border-gray-300 p-3 text-gray-600 transition-colors hover:bg-gray-50 hover:text-gray-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2"
         >
-          {copied ? <CheckIcon /> : <LinkIcon />}
+          {copyStatus === 'copied' ? <CheckIcon /> : <LinkIcon />}
         </button>
+        <span className="sr-only" aria-live="polite">
+          {copyStatus === 'copied' ? 'Link copied' : copyStatus === 'error' ? 'Could not copy link' : ''}
+        </span>
       </div>
     </div>
   )
